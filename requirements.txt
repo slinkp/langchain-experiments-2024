@@ -1,8 +1,7 @@
 langchain
 pinecone-client
 pinecone
-langchain-anthropic
 pypdf
 langchain-community
-langchain-anthropic
+langchain-openai
 langchain-pinecone
