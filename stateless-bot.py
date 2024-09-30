@@ -19,20 +19,22 @@ def main():
     print("Step 2, building RAG chain and asking questions")
     chat = ChatOpenAI(verbose=True, temperature=0, model_name="gpt-3.5-turbo")
 
-    qa = RetrievalQA.from_chain_type(
+    qa = ConversationalRetrievalChain.from_llm(
         llm=chat, chain_type="stuff", retriever=vectorstore.as_retriever()
     )
 
     prompts = (
         "What are the applications of generative AI according to the paper? Please number each application.",
-        "Can you please elaborate more on application number 2?"
+        "Can you please summarize what the paper says about application number 2?"
+        "Say more about that."
         )
 
     for prompt in prompts:
-        res = qa.invoke(prompt)
-        print(f"Q: {res['query']}")
+        res = qa({"question": prompt, "chat_history": chat_history})
+        chat_history.append((res["question"], res["answer"]))
+        print(f"Q: {res['question']}")
         print('-----------------------------------')
-        print(f"A: {res['result']}\n\n")
+        print(f"A: {res['answer']}\n\n")
 
 if __name__ == "__main__":
     main()
