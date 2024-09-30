@@ -3,3 +3,6 @@ pinecone-client
 pinecone
 langchain-anthropic
 pypdf
+langchain-community
+langchain-anthropic
+langchain-pinecone
