@@ -25,7 +25,7 @@ def main():
 
     prompts = (
         "What are the applications of generative AI according to the paper? Please number each application.",
-        "Can you please summarize what the paper says about application number 2?"
+        "Can you please summarize what the paper says about application number 2?",
         "Say more about that."
         )
 

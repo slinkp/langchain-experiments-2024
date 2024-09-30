@@ -6,7 +6,7 @@ Working through https://medium.com/@suraj_bansal/build-your-own-ai-chatbot-a-beg
 
 First set up as below, then:
 
-`python stateless-bot.py`
+`python stateful-bot.py`
 
 # Setup
 
