@@ -23,5 +23,3 @@ print("Step 4. Create embeddings and load into Pinecone")
 
 embeddings = OpenAIEmbeddings(openai_api_type=os.environ.get("OPENAI_API_KEY"))
 PineconeVectorStore.from_documents(texts, embeddings, index_name=os.environ.get("PINECONE_INDEX_NAME"))
-
-chat = ChatOpenAI(verbose=True, temperature=0, model_name="gpt-3.5-turbo")
