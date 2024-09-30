@@ -16,3 +16,14 @@ chat = ChatOpenAI(verbose=True, temperature=0, model_name="gpt-3.5-turbo")
 qa = RetrievalQA.from_chain_type(
     llm=chat, chain_type="stuff", retriever=vectorstore.as_retriever()
 )
+
+prompts = (
+    "What are the applications of generative AI according to the paper? Please number each application.",
+    "Can you please elaborate more on application number 2?"
+)
+
+for prompt in prompts:
+    res = qa.invoke(prompt)
+    print(f"Q: {res['query']}")
+    print('-----------------------------------')
+    print(f"A: {res['result']}\n\n")
