@@ -1,7 +1,7 @@
 import os
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import CharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_pinecone import PineconeVectorStore
 
 print("Step 2. Loading PDF")
@@ -22,4 +22,6 @@ print(f"created {len(texts)} chunks")
 print("Step 4. Create embeddings and load into Pinecone")
 
 embeddings = OpenAIEmbeddings(openai_api_type=os.environ.get("OPENAI_API_KEY"))
-# PineconeVectorStore.from_documents(texts, embeddings, index_name=os.environ.get("PINECONE_INDEX_NAME"))
+PineconeVectorStore.from_documents(texts, embeddings, index_name=os.environ.get("PINECONE_INDEX_NAME"))
+
+chat = ChatOpenAI(verbose=True, temperature=0, model_name="gpt-3.5-turbo")
