@@ -1,3 +1,5 @@
+#!/Users/paul/src/langchain-experiments-2024/.direnv/python-3.12/bin/python
+
 import argparse
 import re
 import os.path
