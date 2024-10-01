@@ -1,2 +1,3 @@
 .envrc
-data/*pdf
+.ipynb_checkpoints
+medium-tutorial/data/*pdf

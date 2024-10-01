@@ -16,7 +16,7 @@ This is in the `medium-tutorial` directory.
 
 My first attempt was working through https://medium.com/@suraj_bansal/build-your-own-ai-chatbot-a-beginners-guide-to-rag-and-langchain-0189a18ec401
 
-# Setup
+### Setup
 
 ```shell
 
@@ -48,6 +48,8 @@ python ingestion.py
 That should populate pinecone with your data for the Retrieval step.
 
 Now the bot should work!
+
+### Running the bot
 
 ```console
 $ python stateful-bot.py
@@ -99,4 +101,34 @@ Generative AI helps make new music by learning from other songs. It
 can create different kinds of music like in movies or games. The music
 it makes is special and can sound like music made by people. This
 helps artists and composers make more music for everyone to enjoy.
+```
+
+## Langchain official tutorial
+
+Next up is this one: https://python.langchain.com/docs/tutorials/rag/
+
+I did the Anthropic version. We need to set some more env vars; sign up for
+langsmith and anthropic API access and:
+
+```sh
+export LANGCHAIN_TRACING_V2="true"
+export LANGSMITH_API_KEY="..."
+export ANTHROPIC_API_KEY="..."
+```
+
+Again, I do this via direnv, so I put those in an `.envrc` file instead of
+using `getpass`.
+
+That done, it Just Works:
+
+```console
+$ python langchain-tutorial/blog-rag-demo.py
+USER_AGENT environment variable not set, consider setting it to identify your requests.
+
+Task Decomposition is a technique for breaking down complex tasks into
+smaller, more manageable steps. It is often used with large language
+models to improve performance on challenging problems. Common
+approaches include Chain of Thought prompting, Tree of Thoughts
+searching, and using prompts or task-specific instructions to guide
+the decomposition process.
 ```
