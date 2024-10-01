@@ -132,3 +132,8 @@ approaches include Chain of Thought prompting, Tree of Thoughts
 searching, and using prompts or task-specific instructions to guide
 the decomposition process.
 ```
+
+### Enhancements
+
+- Persisted the Chroma data store to disk
+  - Only hit the URL if we don't have data (ie, first run)

@@ -1,3 +1,4 @@
+import os.path
 import bs4
 import textwrap
 from langchain import hub
@@ -10,9 +11,11 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from langchain_anthropic import ChatAnthropic
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(HERE, "data")
 
 def get_text_splits_from_url(url):
-    # Load and split the contents of the blog.
+    print(f"Fetching and splitting contents of {url}")
     loader = WebBaseLoader(
         web_paths=(url,),
         bs_kwargs=dict(
@@ -27,8 +30,23 @@ def get_text_splits_from_url(url):
     return splits
 
 
-def make_vector_db(splits):
-    vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
+def make_vector_db():
+    embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
+    vectorstore = Chroma(
+        collection_name="blog-vector-data",
+        embedding_function=embeddings,
+        persist_directory=DATA_DIR,
+    )
+    # Only add the documents to the vectorstore if it's empty
+    has_data = bool(vectorstore.get(limit=1, include=[])["ids"])
+    if has_data:
+        print("Loaded vector store from disk")
+    else:
+        print("Adding documents to the vector store from split data")
+        splits = get_text_splits_from_url(
+            "https://lilianweng.github.io/posts/2023-06-23-agent/"
+        )
+        vectorstore.add_documents(splits)
     return vectorstore
 
 
@@ -37,10 +55,7 @@ def format_docs(docs):
 
 
 def main(question: str):
-    splits = get_text_splits_from_url(
-        "https://lilianweng.github.io/posts/2023-06-23-agent/"
-    )
-    vectorstore = make_vector_db(splits)
+    vectorstore = make_vector_db()
     retriever = vectorstore.as_retriever()
     prompt = hub.pull("rlm/rag-prompt")  # What's this mean?
     llm = ChatAnthropic(model="claude-3-5-sonnet-20240620")
