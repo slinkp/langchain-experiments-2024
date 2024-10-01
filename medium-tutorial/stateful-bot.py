@@ -1,4 +1,5 @@
 import os
+import textwrap
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain.chains import (
     create_history_aware_retriever,
@@ -21,7 +22,7 @@ def main():
     )
     retriever = vectorstore.as_retriever()
 
-    print("Step 2, building RAG chain and asking questions")
+    print("Step 2, building RAG chain")
     llm = ChatOpenAI(verbose=True, temperature=0, model_name="gpt-3.5-turbo")
 
     contextualize_q_system_prompt = (
@@ -67,20 +68,21 @@ def main():
     # TODO finish setting up chain with create_retrieval_chain
     # as per https://api.python.langchain.com/en/latest/chains/langchain.chains.conversational_retrieval.base.ConversationalRetrievalChain.html
 
+    print("Step 3. Asking questions and getting answers")
     prompts = (
         "What are the applications of generative AI according to the paper? Please number each application.",
         "Can you please summarize what the paper says about application number 2 in the previous response?",
-        "Say more about that.",
+        "Say more about that. At least 5 sentences please.",
+        "Can you rephrase that in 4 sentences or less for a first-grade reading level?",
     )
 
     for prompt in prompts:
         res = rag_chain.invoke({"input": prompt, "chat_history": chat_history})
         chat_history.append(HumanMessage(content=res["input"]))
         chat_history.append(AIMessage(content=res["answer"]))
-        print(f"  History size: {len(chat_history)}")
-        print(f"Q: {res['input']}")
-        print("-----------------------------------")
-        print(f"A: {res['answer']}\n\n")
+        print(f"Q: {textwrap.fill(res['input'])}")
+        print("---------------------------------------------------")
+        print(f"A:\n{textwrap.fill(res['answer'])}\n\n")
 
 
 if __name__ == "__main__":
