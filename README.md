@@ -137,3 +137,36 @@ the decomposition process.
 
 - Persisted the Chroma data store to disk
   - Only hit the URL if we don't have data (ie, first run)
+
+- Allow passing `--url` and `--question` on command line
+  - Use a separate data collection for each URL
+
+This is really fun:
+
+```console
+$ python langchain-tutorial/blog-rag-demo.py --url="https://recurse.com" \
+  --question="Can you summarize what this organization is like,
+  in the form of a haiku?  Please include only the haiku itself, no commentary"
+
+Question: Can you summarize what this organization is like, in the
+form of a haiku?  Please include only the haiku itself, no commentary
+
+answering from url https://recurse.com
+
+Coders find solace
+Growth, support, and freedom here
+Recurse Center shines
+
+
+$ python langchain-tutorial/blog-rag-demo.py --url="https://nytimes.com" \
+  --question="What's the first headline about art on this page?"
+
+Question: What's the first headline about art on this page?
+answering from url https://nytimes.com
+
+The first headline about art on this page is "Following Norway's
+National Painter Through Mountains and Fjords". It refers to Harald
+Sohlberg, who is celebrated within Norway but almost unknown outside
+the country. The article appears to be a 7-minute read exploring
+Sohlberg's works depicting Norwegian landscapes.
+```

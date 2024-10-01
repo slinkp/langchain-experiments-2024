@@ -1,6 +1,9 @@
+import argparse
+import re
 import os.path
-import bs4
 import textwrap
+import logging
+
 from langchain import hub
 from langchain_chroma import Chroma
 from langchain_community.document_loaders import WebBaseLoader
@@ -14,15 +17,14 @@ from langchain_anthropic import ChatAnthropic
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(HERE, "data")
 
+
+logger = logging.getLogger(__name__)
+
+
 def get_text_splits_from_url(url):
-    print(f"Fetching and splitting contents of {url}")
+    logger.debug(f"Fetching and splitting contents of {url}")
     loader = WebBaseLoader(
         web_paths=(url,),
-        bs_kwargs=dict(
-            parse_only=bs4.SoupStrainer(
-                class_=("post-content", "post-title", "post-header")
-            )
-        ),
     )
     docs = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
@@ -30,22 +32,22 @@ def get_text_splits_from_url(url):
     return splits
 
 
-def make_vector_db():
+def make_vector_db(collection_name: str, split_function: callable):
     embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
     vectorstore = Chroma(
-        collection_name="blog-vector-data",
+        collection_name=collection_name,
         embedding_function=embeddings,
         persist_directory=DATA_DIR,
     )
     # Only add the documents to the vectorstore if it's empty
     has_data = bool(vectorstore.get(limit=1, include=[])["ids"])
     if has_data:
-        print("Loaded vector store from disk")
+        logging.debug(f"Loaded vector store for {collection_name}")
     else:
-        print("Adding documents to the vector store from split data")
-        splits = get_text_splits_from_url(
-            "https://lilianweng.github.io/posts/2023-06-23-agent/"
+        logging.info(
+            f"Adding initial documets to the vector store {collection_name} from split data"
         )
+        splits = split_function()
         vectorstore.add_documents(splits)
     return vectorstore
 
@@ -54,8 +56,26 @@ def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
 
-def main(question: str):
-    vectorstore = make_vector_db()
+def get_collection_name(url: str):
+    url = re.sub(r"https?://", "", url)
+    url = re.sub(r"\W+", "-", url)
+    url = url.strip("-_")
+    url = url[:63]
+    # (3) otherwise contains only alphanumeric characters, underscores or hyphens (-),
+    # (4) contains no two consecutive periods (..),
+    # and (5) is not a valid IPv4 address
+    logging.debug(f"Collection name: {url}")
+    return url
+
+
+def main(url: str, question: str):
+    # Normalize the url into a collection name
+    collection_name = get_collection_name(url)
+
+    def splits_function():
+        return get_text_splits_from_url(url)
+
+    vectorstore = make_vector_db(collection_name, splits_function)
     retriever = vectorstore.as_retriever()
     prompt = hub.pull("rlm/rag-prompt")  # What's this mean?
     llm = ChatAnthropic(model="claude-3-5-sonnet-20240620")
@@ -69,5 +89,23 @@ def main(question: str):
 
 
 if __name__ == "__main__":
-    result = main("What is Task Decomposition?")
-    print(textwrap.fill(result))
+
+    # Parse arguments and get optional URL and question
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--url", default="https://lilianweng.github.io/posts/2023-06-23-agent/"
+    )
+    parser.add_argument("--question", default="What is Task Decomposition?")
+    parser.add_argument("--verbose", action="store_true")
+    parsed_args = parser.parse_args()
+    url = parsed_args.url
+    question = parsed_args.question
+    if parsed_args.verbose:
+        logging.basicConfig(level=logging.DEBUG)
+
+    result = main(url, question)
+    print()
+    print(textwrap.fill(f"Question: {question}"))
+    print(textwrap.fill(f"answering from url {url}"))
+    print()
+    print(textwrap.fill(result, replace_whitespace=False))
