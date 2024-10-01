@@ -12,6 +12,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 
 chat_history = []
 
+
 def main():
     print("Step 1. Loading knowledge")
     embeddings = OpenAIEmbeddings()
@@ -29,13 +30,14 @@ def main():
         "formulate a standalone question which can be understood "
         "without the chat history. Do NOT answer the question, just "
         "reformulate it if needed and otherwise return it as is."
-        )
+    )
     contextualize_q_prompt = ChatPromptTemplate.from_messages(
         [
-         ("system", contextualize_q_system_prompt),
-         MessagesPlaceholder("chat_history"),
-         ("human", "{input}"),
-        ])
+            ("system", contextualize_q_system_prompt),
+            MessagesPlaceholder("chat_history"),
+            ("human", "{input}"),
+        ]
+    )
     history_aware_retriever = create_history_aware_retriever(
         llm, retriever, contextualize_q_prompt
     )
@@ -49,13 +51,14 @@ def main():
         "concise."
         "\n\n"
         "{context}"
-        )
+    )
     qa_prompt = ChatPromptTemplate.from_messages(
         [
-         ("system", qa_system_prompt),
-         MessagesPlaceholder("chat_history"),
-         ("human", "{input}"),
-        ])
+            ("system", qa_system_prompt),
+            MessagesPlaceholder("chat_history"),
+            ("human", "{input}"),
+        ]
+    )
 
     # Below we use create_stuff_documents_chain to feed all retrieved context
     # into the LLM.
@@ -67,8 +70,8 @@ def main():
     prompts = (
         "What are the applications of generative AI according to the paper? Please number each application.",
         "Can you please summarize what the paper says about application number 2 in the previous response?",
-        "Say more about that."
-        )
+        "Say more about that.",
+    )
 
     for prompt in prompts:
         res = rag_chain.invoke({"input": prompt, "chat_history": chat_history})
@@ -76,8 +79,9 @@ def main():
         chat_history.append(AIMessage(content=res["answer"]))
         print(f"  History size: {len(chat_history)}")
         print(f"Q: {res['input']}")
-        print('-----------------------------------')
+        print("-----------------------------------")
         print(f"A: {res['answer']}\n\n")
+
 
 if __name__ == "__main__":
     main()
