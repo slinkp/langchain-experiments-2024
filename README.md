@@ -122,7 +122,7 @@ using `getpass`.
 That done, it Just Works:
 
 ```console
-$ python langchain-tutorial/blog-rag-demo.py
+$ python langchain-tutorial/website-questioner.py
 USER_AGENT environment variable not set, consider setting it to identify your requests.
 
 Task Decomposition is a technique for breaking down complex tasks into
@@ -144,7 +144,7 @@ the decomposition process.
 This is really fun:
 
 ```console
-$ python langchain-tutorial/blog-rag-demo.py --url="https://recurse.com" \
+$ ./website-questioner.py --url="https://recurse.com" \
   --question="Can you summarize what this organization is like,
   in the form of a haiku?  Please include only the haiku itself, no commentary"
 
@@ -158,7 +158,7 @@ Growth, support, and freedom here
 Recurse Center shines
 
 
-$ python langchain-tutorial/blog-rag-demo.py --url="https://nytimes.com" \
+$ ./website-questioner.py --url="https://nytimes.com" \
   --question="What's the first headline about art on this page?"
 
 Question: What's the first headline about art on this page?
