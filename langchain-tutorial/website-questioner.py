@@ -79,7 +79,7 @@ def main(url: str, question: str):
 
     vectorstore = make_vector_db(collection_name, splits_function)
     retriever = vectorstore.as_retriever()
-    prompt = hub.pull("rlm/rag-prompt")  # What's this mean?
+    prompt = hub.pull("rlm/rag-prompt")  # This gets prompt text from https://smith.langchain.com/hub/rlm/rag-prompt
     llm = ChatAnthropic(model="claude-3-5-sonnet-20240620")
     rag_chain = (
         {"context": retriever | format_docs, "question": RunnablePassthrough()}
