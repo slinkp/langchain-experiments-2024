@@ -1,3 +1,4 @@
 .envrc
 .ipynb_checkpoints
 medium-tutorial/data/*pdf
+langchain-tutorial/data/*
